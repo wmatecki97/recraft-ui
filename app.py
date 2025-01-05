@@ -45,7 +45,7 @@ def generate_image(prompt, colors, style_id, style, substyle, model, response_fo
         extra_body=extra_body
     )
     
-    if response.
+    if response:
         image_urls = [item.url for item in response.data]
         return image_urls
     else:
