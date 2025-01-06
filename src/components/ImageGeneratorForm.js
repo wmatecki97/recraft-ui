@@ -1,15 +1,26 @@
 import React, { useState } from 'react';
+import ColorPicker from './ColorPicker';
 
 const ImageGeneratorForm = ({ onGenerate }) => {
     const [apiKey, setApiKey] = useState('');
     const [prompt, setPrompt] = useState('Turtle working in AI');
-    const colorsData = [{"rgb":[142,202,230]},{"rgb":[88,180,209]},{"rgb":[33,158,188]},{"rgb":[18,103,130]},{"rgb":[2,48,71]},{"rgb":[255,183,3]},{"rgb":[253,158,2]},{"rgb":[251,133,0]}];
-    const [colors, setColors] = useState(JSON.stringify(colorsData));
+    const initialColorsData = [{"rgb":[142,202,230]},{"rgb":[88,180,209]},{"rgb":[33,158,188]},{"rgb":[18,103,130]},{"rgb":[2,48,71]},{"rgb":[255,183,3]},{"rgb":[253,158,2]},{"rgb":[251,133,0]}];
+    const [colors, setColors] = useState(initialColorsData.map(color => rgbToHex(color.rgb)));
     const [responseFormat, setResponseFormat] = useState('url');
     const [artisticLevel, setArtisticLevel] = useState(5);
     const [size, setSize] = useState('1024x1024');
     const [numImagesPerPrompt, setNumImagesPerPrompt] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+
+    function rgbToHex(rgb) {
+        const [r, g, b] = rgb;
+        return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+    }
+
+    const handleColorsChange = (newColors) => {
+        setColors(newColors);
+    };
 
     const downloadImage = async (url, filename) => {
         try {
@@ -49,6 +60,17 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     n: numImagesPerPrompt,
                     style: "vector_illustration",
                     substyle:"roundish_flat",
+                    // "response_format": responseFormat,
+                    // "artistic_level": artisticLevel,
+                    // "size": size,
+                    "controls": {
+                        "colors": colors.map(hex => {
+                            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                            return result ? {
+                                "rgb": [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
+                            } : null;
+                        }).filter(color => color)
+                    }
                 }),
             });
 
@@ -92,34 +114,43 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                 <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
             </div>
             <div>
-                <label>Colors (JSON string):</label>
-                <input type="text" value={colors} onChange={(e) => setColors(e.target.value)} />
+                <label>Colors:</label>
+                <ColorPicker initialColors={colors} onColorsChange={handleColorsChange} />
             </div>
-            <div>
-                <label>Response Format:</label>
-                <select value={responseFormat} onChange={(e) => setResponseFormat(e.target.value)}>
-                    <option value="url">url</option>
-                    <option value="b64_json">b64_json</option>
-                </select>
-            </div>
-             <div>
-                <label>Artistic Level:</label>
-                <input type="number" value={artisticLevel} min="0" max="10" step="1" onChange={(e) => setArtisticLevel(parseInt(e.target.value, 10))} />
-            </div>
-            <div>
-                <label>Size:</label>
-                <select value={size} onChange={(e) => setSize(e.target.value)}>
-                    <option value="256x256">256x256</option>
-                    <option value="512x512">512x512</option>
-                    <option value="1024x1024">1024x1024</option>
-                    <option value="1024x1792">1024x1792</option>
-                    <option value="1792x1024">1792x1024</option>
-                </select>
-            </div>
-            <div>
-                <label>Number of Images:</label>
-                <input type="number" value={numImagesPerPrompt} min="1" max="4" onChange={(e) => setNumImagesPerPrompt(parseInt(e.target.value, 10))} />
-            </div>
+
+            <button type="button" onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}>
+                Advanced Settings {showAdvancedSettings ? '▲' : '▼'}
+            </button>
+
+            {showAdvancedSettings && (
+                <>
+                    {/* <div>
+                        <label>Response Format:</label>
+                        <select value={responseFormat} onChange={(e) => setResponseFormat(e.target.value)}>
+                            <option value="url">url</option>
+                            <option value="b64_json">b64_json</option>
+                        </select>
+                    </div> */}
+                    <div>
+                        <label>Artistic Level:</label>
+                        <input type="number" value={artisticLevel} min="0" max="10" step="1" onChange={(e) => setArtisticLevel(parseInt(e.target.value, 10))} />
+                    </div>
+                    <div>
+                        <label>Size:</label>
+                        <select value={size} onChange={(e) => setSize(e.target.value)}>
+                            <option value="256x256">256x256</option>
+                            <option value="512x512">512x512</option>
+                            <option value="1024x1024">1024x1024</option>
+                            <option value="1024x1792">1024x1792</option>
+                            <option value="1792x1024">1792x1024</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Number of Images:</label>
+                        <input type="number" value={numImagesPerPrompt} min="1" max="4" onChange={(e) => setNumImagesPerPrompt(parseInt(e.target.value, 10))} />
+                    </div>
+                </>
+            )}
             <button type="submit" disabled={loading}>
                 {loading ? 'Generating...' : 'Generate Image'}
             </button>

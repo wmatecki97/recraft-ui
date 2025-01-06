@@ -47,3 +47,68 @@
 .App form button:hover {
   background-color: #0056b3;
 }
+
+.App form .color-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+}
+
+.App form .color-input-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.App form .color-input-container input[type="color"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 2px;
+}
+
+.App form .color-input-container input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.App form .color-input-container input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+
+.App form .color-input-container input[type="color"]::-moz-color-swatch-wrapper {
+    padding: 0;
+}
+
+.App form .color-input-container input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+
+
+.App form .add-color-button,
+.App form .remove-color-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #ddd;
+    color: #333;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.App form .add-color-button:hover,
+.App form .remove-color-button:hover {
+    background-color: #ccc;
+}
+
+.App form > button {
+    margin-top: 10px;
+}
