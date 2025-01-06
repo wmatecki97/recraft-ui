@@ -2,7 +2,7 @@ import gradio as gr
 import requests
 import json
 
-def generate_image(api_key, prompt, colors, style, response_format, artistic_level, size, num_images_per_prompt):
+def generate_image(api_key, prompt, colors, response_format, artistic_level, size, num_images_per_prompt):
     try:
         url = 'https://external.api.recraft.ai/v1/images/generations'
         headers = {
@@ -16,15 +16,13 @@ def generate_image(api_key, prompt, colors, style, response_format, artistic_lev
         data = {
             "prompt": prompt,
             "model": "recraftv3",
-            # "response_format": response_format,
-            # "artistic_level": artistic_level,
-            # "size": size,
             "n": num_images_per_prompt,
             "style": "vector_illustration",
             "substyle":"roundish_flat",
-            # "controls": {
-            #     "colors": colors_list
-            # }
+            "controls": {
+                "colors": colors_list,
+                "artistic_level": artistic_level
+            }
         }
         
         response = requests.post(url, headers=headers, json=data)
@@ -52,7 +50,7 @@ if __name__ == "__main__":
         api_key = gr.Textbox(label="Recraft API Key", type="password")
         prompt = gr.Textbox(label="Prompt", value="Turtle working in AI")
         colors_data = [{"rgb":[142,202,230]},{"rgb":[88,180,209]},{"rgb":[33,158,188]},{"rgb":[18,103,130]},{"rgb":[2,48,71]},{"rgb":[255,183,3]},{"rgb":[253,158,2]},{"rgb":[251,133,0]}]
-        colors = gr.Textbox(label="Colors (JSON string, e.g., ['red', 'blue'])", placeholder="['red', 'blue']", value=json.dumps(colors_data))
+        colors = gr.Textbox(label="Colors (JSON string, e.g., [{'rgb':[255,0,0]}, {'rgb':[0,0,255]}])", placeholder="[{'rgb':[255,0,0]}, {'rgb':[0,0,255]}]", value=json.dumps(colors_data))
 
         response_format = gr.Dropdown(label="Response Format", choices=["", "url", "b64_json"], value="url")
         artistic_level = gr.Slider(label="Artistic Level", minimum=0, maximum=10, step=1, value=5)
