@@ -1,6 +1,8 @@
 import gradio as gr
 import requests
 import json
+import os
+import uuid
 
 def generate_image(api_key, prompt, colors, response_format, artistic_level, size, num_images_per_prompt):
     try:
@@ -31,11 +33,29 @@ def generate_image(api_key, prompt, colors, response_format, artistic_level, siz
         response_data = response.json()
 
         if response_data and response_data.get('data'):
-            image_urls = [item.get('url') for item in response_data['data'] if item.get('url')]
-            if image_urls:
-                return image_urls
+            image_files = []
+            for item in response_data['data']:
+                image_url = item.get('url')
+                if image_url:
+                    try:
+                        image_response = requests.get(image_url, stream=True)
+                        image_response.raise_for_status()
+                        
+                        file_name = f"image_{uuid.uuid4()}.png"
+                        file_path = os.path.join(os.getcwd(), file_name)
+                        
+                        with open(file_path, 'wb') as f:
+                            for chunk in image_response.iter_content(chunk_size=8192):
+                                f.write(chunk)
+                        image_files.append(file_path)
+                    except requests.exceptions.RequestException as e:
+                        print(f"Error downloading image: {e}")
+                else:
+                    print("No image URL found in response item")
+            if image_files:
+                return image_files
             else:
-                return ["No image URLs found in response"]
+                return ["No images generated"]
         else:
             return ["No images generated"]
     except requests.exceptions.RequestException as e:
