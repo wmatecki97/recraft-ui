@@ -25,6 +25,15 @@ const ImageGeneratorForm = ({ onGenerate }) => {
             setSize(settings.size || '1024x1024');
             setNumImagesPerPrompt(settings.numImagesPerPrompt || 1);
             setShowAdvancedSettings(settings.showAdvancedSettings || false);
+        } else {
+            // Only set default values if no settings are found in local storage
+            setPrompt('Turtle working in AI');
+            setColors(initialColorsData.map(color => rgbToHex(color.rgb)));
+            setResponseFormat('url');
+            setArtisticLevel(5);
+            setSize('1024x1024');
+            setNumImagesPerPrompt(1);
+            setShowAdvancedSettings(false);
         }
     }, []);
 
