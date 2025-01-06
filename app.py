@@ -16,15 +16,15 @@ def generate_image(api_key, prompt, colors, style, response_format, artistic_lev
         data = {
             "prompt": prompt,
             "model": "recraftv3",
-            "response_format": response_format,
-            "artistic_level": artistic_level,
-            "size": size,
+            # "response_format": response_format,
+            # "artistic_level": artistic_level,
+            # "size": size,
             "n": num_images_per_prompt,
             "style": "vector_illustration",
             "substyle":"roundish_flat",
-            "controls": {
-                "colors": colors_list
-            }
+            # "controls": {
+            #     "colors": colors_list
+            # }
         }
         
         response = requests.post(url, headers=headers, json=data)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         response_format = gr.Dropdown(label="Response Format", choices=["", "url", "b64_json"], value="url")
         artistic_level = gr.Slider(label="Artistic Level", minimum=0, maximum=10, step=1, value=5)
         size = gr.Dropdown(label="Size", choices=["", "256x256", "512x512", "1024x1024", "1024x1792", "1792x1024"], value="1024x1024")
-        num_images_per_prompt = gr.Number(label="Number of Images", value=2, minimum=1, maximum=4)
+        num_images_per_prompt = gr.Number(label="Number of Images", value=1, minimum=1, maximum=4)
         
         
         generate_button = gr.Button("Generate Image")
