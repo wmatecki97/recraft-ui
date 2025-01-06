@@ -4,7 +4,7 @@ import ColorPicker from './ColorPicker';
 const ImageGeneratorForm = ({ onGenerate }) => {
     const [apiKey, setApiKey] = useState('');
     const [prompt, setPrompt] = useState('');
-    const initialColorsData = [{"rgb":[142,202,230]},{"rgb":[88,180,209]},{"rgb":[33,158,188]},{"rgb":[18,103,130]},{"rgb":[2,48,71]},{"rgb":[255,183,3]},{"rgb":[253,158,2]},{"rgb":[251,133,0]}];
+    const initialColorsData = [{ "rgb": [142, 202, 230] }, { "rgb": [88, 180, 209] }, { "rgb": [33, 158, 188] }, { "rgb": [18, 103, 130] }, { "rgb": [2, 48, 71] }, { "rgb": [255, 183, 3] }, { "rgb": [253, 158, 2] }, { "rgb": [251, 133, 0] }];
     const [colors, setColors] = useState([]);
     const [responseFormat, setResponseFormat] = useState(null);
     const [artisticLevel, setArtisticLevel] = useState(null);
@@ -20,9 +20,9 @@ const ImageGeneratorForm = ({ onGenerate }) => {
         if (storedSettings) {
             settings = JSON.parse(storedSettings);
         }
-        
+
         setApiKey(settings?.apiKey || '');
-        setPrompt(settings?.prompt || 'Turtle working in AI');
+        setPrompt(settings?.prompt || 'Robot jumping rope');
         setColors(settings?.colors || initialColorsData.map(color => rgbToHex(color.rgb)));
         setResponseFormat(settings?.responseFormat || 'url');
         setArtisticLevel(settings?.artisticLevel || 5);
@@ -85,8 +85,8 @@ const ImageGeneratorForm = ({ onGenerate }) => {
             reader.onload = (e) => {
                 try {
                     const settings = JSON.parse(e.target.result);
-                     setApiKey(settings.apiKey || '');
-                    setPrompt(settings.prompt || 'Turtle working in AI');
+                    setApiKey(settings.apiKey || '');
+                    setPrompt(settings.prompt || 'Robot jumping rope');
                     setColors(settings.colors || initialColorsData.map(color => rgbToHex(color.rgb)));
                     setResponseFormat(settings.responseFormat || 'url');
                     setArtisticLevel(settings.artisticLevel || 5);
@@ -142,7 +142,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     model: "recraftv3",
                     n: numImagesPerPrompt,
                     style: "vector_illustration",
-                    substyle:"roundish_flat",
+                    substyle: "roundish_flat",
                     // "response_format": responseFormat,
                     // "artistic_level": artisticLevel,
                     // "size": size,
@@ -167,7 +167,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
             if (responseData && responseData.data) {
                 const image_urls = responseData.data
                     .filter(item => item.url)
-                    .map((item, index) => ({url: item.url, filename: `image_${index + 1}.png`}));
+                    .map((item, index) => ({ url: item.url, filename: `image_${index + 1}.png` }));
                 if (image_urls.length > 0) {
                     await Promise.all(image_urls.map(image => downloadImage(image.url, image.filename)));
                     onGenerate(image_urls.map(image => image.url));
@@ -175,7 +175,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     onGenerate(["No image URLs found in response"]);
                 }
             } else {
-                 onGenerate(["No images generated"]);
+                onGenerate(["No images generated"]);
             }
         } catch (error) {
             console.error("Request Error:", error);
@@ -236,7 +236,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
             )}
             <div>
                 <button type="button" onClick={handleExportSettings}>Export Settings</button>
-                <input type="file" accept=".json" onChange={handleImportSettings} style={{display: 'none'}} id="import-settings"/>
+                <input type="file" accept=".json" onChange={handleImportSettings} style={{ display: 'none' }} id="import-settings" />
                 <label htmlFor="import-settings">Import Settings</label>
             </div>
             <button type="submit" disabled={loading}>
