@@ -3,6 +3,7 @@ import requests
 import json
 import os
 import uuid
+import base64
 
 def generate_image(api_key, prompt, colors, response_format, artistic_level, size, num_images_per_prompt):
     try:
@@ -34,6 +35,7 @@ def generate_image(api_key, prompt, colors, response_format, artistic_level, siz
 
         if response_data and response_data.get('data'):
             image_files = []
+            download_links = []
             for item in response_data['data']:
                 image_url = item.get('url')
                 if image_url:
@@ -47,23 +49,27 @@ def generate_image(api_key, prompt, colors, response_format, artistic_level, siz
                         with open(file_path, 'wb') as f:
                             for chunk in image_response.iter_content(chunk_size=8192):
                                 f.write(chunk)
-                        image_files.append(gr.File(file_path))
+                        image_files.append(file_path)
+                        
+                        # Create a download link
+                        download_links.append(f'<a href="{file_path}" download="{file_name}">Download {file_name}</a>')
+                        
                     except requests.exceptions.RequestException as e:
                         print(f"Error downloading image: {e}")
                 else:
                     print("No image URL found in response item")
             if image_files:
-                return image_files
+                return  "<br>".join(download_links)
             else:
-                return [gr.File(None, label="No images generated")]
+                return "No images generated"
         else:
-            return [gr.File(None, label="No images generated")]
+            return "No images generated"
     except requests.exceptions.RequestException as e:
         print(f"Request Error: {e}")
-        return [gr.File(None, label=f"Request Error: {e}")]
+        return f"Request Error: {e}"
     except Exception as e:
         print(f"Error: {e}")
-        return [gr.File(None, label=f"Error: {e}")]
+        return f"Error: {e}"
 
 if __name__ == "__main__":
     with gr.Blocks() as demo:
@@ -79,12 +85,12 @@ if __name__ == "__main__":
         
         
         generate_button = gr.Button("Generate Image")
-        file_output = gr.File(label="Generated Images")
+        html_output = gr.HTML(label="Generated Images")
 
         generate_button.click(
             generate_image,
             inputs=[api_key, prompt, colors, response_format, artistic_level, size, num_images_per_prompt],
-            outputs=file_output
+            outputs=html_output
         )
 
     demo.launch()
