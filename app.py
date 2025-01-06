@@ -1,40 +1,47 @@
 import gradio as gr
-import openai
+import requests
 import json
 
 def generate_image(api_key, prompt, colors, style, response_format, artistic_level, size, num_images_per_prompt):
     try:
-        client = openai.OpenAI(base_url='https://external.api.recraft.ai/v1',
-                               api_key=api_key)
+        url = 'https://external.api.recraft.ai/v1/images/generations'
+        headers = {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {api_key}'
+        }
         
         colors_list = json.loads(colors) if colors else None
 
-        params = {
+        data = {
             "prompt": prompt,
-            "extra_body": {
-
-            "style": "vector_illustration",
-            "substyle":"roundish_flat",
             "model": "recraftv3",
             "response_format": response_format,
             "artistic_level": artistic_level,
             "size": size,
-            "num_images_per_prompt": num_images_per_prompt,
-                "controls": {
-                    "colors": colors_list
-                }
+            "n": num_images_per_prompt,
+            "style": "vector_illustration",
+            "substyle":"roundish_flat",
+            "controls": {
+                "colors": colors_list
             }
         }
         
-        response = client.images.generate(**params)
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        
+        response_data = response.json()
 
-        if response:
-            image_urls = [item.url for item in response.data]
+        if response_data and response_data.get('data'):
+            image_urls = [item.get('url') for item in response_data['data']]
             return image_urls
         else:
             return ["No images generated"]
+    except requests.exceptions.RequestException as e:
+        print(f"Request Error: {e}")
+        return [f"Request Error: {e}"]
     except Exception as e:
-        print(e)
+        print(f"Error: {e}")
         return [f"Error: {e}"]
 
 if __name__ == "__main__":
