@@ -17,7 +17,7 @@
     appearance: none;
     width: 30px;
     height: 30px;
-    border: none;
+    border: 1px solid #ccc;
     cursor: pointer;
     padding: 0;
     border-radius: 2px;

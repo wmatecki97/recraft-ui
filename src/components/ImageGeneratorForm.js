@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ColorPicker from './ColorPicker';
 
 const ImageGeneratorForm = ({ onGenerate }) => {
@@ -12,6 +12,36 @@ const ImageGeneratorForm = ({ onGenerate }) => {
     const [numImagesPerPrompt, setNumImagesPerPrompt] = useState(1);
     const [loading, setLoading] = useState(false);
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+
+    useEffect(() => {
+        const storedSettings = localStorage.getItem('imageGeneratorSettings');
+        if (storedSettings) {
+            const settings = JSON.parse(storedSettings);
+            setApiKey(settings.apiKey || '');
+            setPrompt(settings.prompt || 'Turtle working in AI');
+            setColors(settings.colors || initialColorsData.map(color => rgbToHex(color.rgb)));
+            setResponseFormat(settings.responseFormat || 'url');
+            setArtisticLevel(settings.artisticLevel || 5);
+            setSize(settings.size || '1024x1024');
+            setNumImagesPerPrompt(settings.numImagesPerPrompt || 1);
+            setShowAdvancedSettings(settings.showAdvancedSettings || false);
+        }
+    }, []);
+
+    useEffect(() => {
+        const settings = {
+            apiKey,
+            prompt,
+            colors,
+            responseFormat,
+            artisticLevel,
+            size,
+            numImagesPerPrompt,
+            showAdvancedSettings
+        };
+        localStorage.setItem('imageGeneratorSettings', JSON.stringify(settings));
+    }, [apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings]);
+
 
     function rgbToHex(rgb) {
         const [r, g, b] = rgb;
@@ -40,6 +70,53 @@ const ImageGeneratorForm = ({ onGenerate }) => {
         } catch (error) {
             console.error('Error downloading image:', error);
         }
+    };
+
+    const handleImportSettings = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const settings = JSON.parse(e.target.result);
+                     setApiKey(settings.apiKey || '');
+                    setPrompt(settings.prompt || 'Turtle working in AI');
+                    setColors(settings.colors || initialColorsData.map(color => rgbToHex(color.rgb)));
+                    setResponseFormat(settings.responseFormat || 'url');
+                    setArtisticLevel(settings.artisticLevel || 5);
+                    setSize(settings.size || '1024x1024');
+                    setNumImagesPerPrompt(settings.numImagesPerPrompt || 1);
+                    setShowAdvancedSettings(settings.showAdvancedSettings || false);
+                } catch (error) {
+                    console.error("Error parsing settings file:", error);
+                    alert("Failed to import settings. Please ensure the file is a valid JSON.");
+                }
+            };
+            reader.readAsText(file);
+        }
+    };
+
+    const handleExportSettings = () => {
+        const settings = {
+            apiKey,
+            prompt,
+            colors,
+            responseFormat,
+            artisticLevel,
+            size,
+            numImagesPerPrompt,
+            showAdvancedSettings
+        };
+        const json = JSON.stringify(settings, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'image_generator_settings.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     };
 
 
@@ -151,6 +228,11 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     </div>
                 </>
             )}
+            <div>
+                <button type="button" onClick={handleExportSettings}>Export Settings</button>
+                <input type="file" accept=".json" onChange={handleImportSettings} style={{display: 'none'}} id="import-settings"/>
+                <label htmlFor="import-settings">Import Settings</label>
+            </div>
             <button type="submit" disabled={loading}>
                 {loading ? 'Generating...' : 'Generate Image'}
             </button>
