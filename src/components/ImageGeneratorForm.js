@@ -11,26 +11,24 @@ const ImageGeneratorForm = ({ onGenerate }) => {
     const [numImagesPerPrompt, setNumImagesPerPrompt] = useState(1);
     const [loading, setLoading] = useState(false);
 
-    const downloadImage = (url, filename) => {
-        fetch(url, {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
+    const downloadImage = async (url, filename) => {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
             }
-        })
-            .then(response => response.blob())
-            .then(blob => {
-                const blobURL = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = blobURL;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(blobURL);
-            })
-            .catch(error => console.error('Error downloading image:', error));
+            const blob = await response.blob();
+            const blobURL = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobURL;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobURL);
+        } catch (error) {
+            console.error('Error downloading image:', error);
+        }
     };
 
 
@@ -66,7 +64,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     .filter(item => item.url)
                     .map((item, index) => ({url: item.url, filename: `image_${index + 1}.png`}));
                 if (image_urls.length > 0) {
-                    image_urls.forEach(image => downloadImage(image.url, image.filename));
+                    await Promise.all(image_urls.map(image => downloadImage(image.url, image.filename)));
                     onGenerate(image_urls.map(image => image.url));
                 } else {
                     onGenerate(["No image URLs found in response"]);
