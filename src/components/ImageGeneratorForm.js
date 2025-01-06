@@ -12,6 +12,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
     const [numImagesPerPrompt, setNumImagesPerPrompt] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         const storedSettings = localStorage.getItem('imageGeneratorSettings');
@@ -28,21 +29,24 @@ const ImageGeneratorForm = ({ onGenerate }) => {
         setSize(settings?.size || '1024x1024');
         setNumImagesPerPrompt(settings?.numImagesPerPrompt || 1);
         setShowAdvancedSettings(settings?.showAdvancedSettings || false);
+        setIsLoaded(true);
     }, []);
 
     useEffect(() => {
-        const settings = {
-            apiKey,
-            prompt,
-            colors,
-            responseFormat,
-            artisticLevel,
-            size,
-            numImagesPerPrompt,
-            showAdvancedSettings
-        };
-        localStorage.setItem('imageGeneratorSettings', JSON.stringify(settings));
-    }, [apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings]);
+        if (isLoaded) {
+            const settings = {
+                apiKey,
+                prompt,
+                colors,
+                responseFormat,
+                artisticLevel,
+                size,
+                numImagesPerPrompt,
+                showAdvancedSettings
+            };
+            localStorage.setItem('imageGeneratorSettings', JSON.stringify(settings));
+        }
+    }, [apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, isLoaded]);
 
 
     function rgbToHex(rgb) {
