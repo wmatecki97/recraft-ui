@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import ColorPicker from './ColorPicker';
+import ApiKeyInput from './ApiKeyInput';
+import PromptInput from './PromptInput';
+import AdvancedSettings from './AdvancedSettings';
+import SettingsImportExport from './SettingsImportExport';
+import GenerateButton from './GenerateButton';
 
 const ImageGeneratorForm = ({ onGenerate }) => {
     const [apiKey, setApiKey] = useState('');
@@ -188,60 +193,28 @@ const ImageGeneratorForm = ({ onGenerate }) => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <div>
-                <label>Recraft API Key:</label>
-                <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} />
-            </div>
-            <div>
-                <label>Prompt:</label>
-                <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
-            </div>
+            <ApiKeyInput apiKey={apiKey} setApiKey={setApiKey} />
+            <PromptInput prompt={prompt} setPrompt={setPrompt} />
             <div>
                 <label>Colors:</label>
                 <ColorPicker initialColors={colors} onColorsChange={handleColorsChange} />
             </div>
 
-            <button type="button" onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}>
-                Advanced Settings {showAdvancedSettings ? '▲' : '▼'}
-            </button>
-
-            {showAdvancedSettings && (
-                <>
-                    {/* <div>
-                        <label>Response Format:</label>
-                        <select value={responseFormat} onChange={(e) => setResponseFormat(e.target.value)}>
-                            <option value="url">url</option>
-                            <option value="b64_json">b64_json</option>
-                        </select>
-                    </div> */}
-                    <div>
-                        <label>Artistic Level:</label>
-                        <input type="number" value={artisticLevel} min="0" max="10" step="1" onChange={(e) => setArtisticLevel(parseInt(e.target.value, 10))} />
-                    </div>
-                    <div>
-                        <label>Size:</label>
-                        <select value={size} onChange={(e) => setSize(e.target.value)}>
-                            <option value="256x256">256x256</option>
-                            <option value="512x512">512x512</option>
-                            <option value="1024x1024">1024x1024</option>
-                            <option value="1024x1792">1024x1792</option>
-                            <option value="1792x1024">1792x1024</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Number of Images:</label>
-                        <input type="number" value={numImagesPerPrompt} min="1" max="4" onChange={(e) => setNumImagesPerPrompt(parseInt(e.target.value, 10))} />
-                    </div>
-                </>
-            )}
-            <div>
-                <button type="button" onClick={handleExportSettings}>Export Settings</button>
-                <input type="file" accept=".json" onChange={handleImportSettings} style={{ display: 'none' }} id="import-settings" />
-                <label htmlFor="import-settings">Import Settings</label>
-            </div>
-            <button type="submit" disabled={loading}>
-                {loading ? 'Generating...' : 'Generate Image'}
-            </button>
+            <AdvancedSettings
+                artisticLevel={artisticLevel}
+                setArtisticLevel={setArtisticLevel}
+                size={size}
+                setSize={setSize}
+                numImagesPerPrompt={numImagesPerPrompt}
+                setNumImagesPerPrompt={setNumImagesPerPrompt}
+                showAdvancedSettings={showAdvancedSettings}
+                setShowAdvancedSettings={setShowAdvancedSettings}
+            />
+            <SettingsImportExport
+                handleExportSettings={handleExportSettings}
+                handleImportSettings={handleImportSettings}
+            />
+            <GenerateButton loading={loading} handleSubmit={handleSubmit} />
         </form>
     );
 };
