@@ -28,7 +28,7 @@
 }
 
 .color-input-container input[type="color"]::-webkit-color-swatch {
-    border: 1px solid #ccc;
+    border: 1px solid #000;
     border-radius: 2px;
 }
 
@@ -37,7 +37,7 @@
 }
 
 .color-input-container input[type="color"]::-moz-color-swatch {
-    border: 1px solid #ccc;
+    border: 1px solid #000;
     border-radius: 2px;
 }
 
