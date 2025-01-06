@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './App.css';
-import ImageGallery from './components/ImageGallery';
 import ImageGeneratorForm from './components/ImageGeneratorForm';
 
 function App() {
@@ -14,7 +13,7 @@ function App() {
     <div className="App">
       <h1>Recraft Image Generator</h1>
       <ImageGeneratorForm onGenerate={handleImageGeneration} />
-      <ImageGallery images={generatedImages} />
+      {generatedImages.length > 0 && <p>Images generated!</p>}
     </div>
   );
 }

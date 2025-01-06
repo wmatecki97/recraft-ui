@@ -9,9 +9,34 @@ const ImageGeneratorForm = ({ onGenerate }) => {
     const [artisticLevel, setArtisticLevel] = useState(5);
     const [size, setSize] = useState('1024x1024');
     const [numImagesPerPrompt, setNumImagesPerPrompt] = useState(1);
+    const [loading, setLoading] = useState(false);
+
+    const downloadImage = (url, filename) => {
+        fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            }
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const blobURL = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobURL;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobURL);
+            })
+            .catch(error => console.error('Error downloading image:', error));
+    };
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true);
         try {
             const response = await fetch('https://external.api.recraft.ai/v1/images/generations', {
                 method: 'POST',
@@ -39,9 +64,10 @@ const ImageGeneratorForm = ({ onGenerate }) => {
             if (responseData && responseData.data) {
                 const image_urls = responseData.data
                     .filter(item => item.url)
-                    .map(item => item.url);
+                    .map((item, index) => ({url: item.url, filename: `image_${index + 1}.png`}));
                 if (image_urls.length > 0) {
-                    onGenerate(image_urls);
+                    image_urls.forEach(image => downloadImage(image.url, image.filename));
+                    onGenerate(image_urls.map(image => image.url));
                 } else {
                     onGenerate(["No image URLs found in response"]);
                 }
@@ -51,6 +77,8 @@ const ImageGeneratorForm = ({ onGenerate }) => {
         } catch (error) {
             console.error("Request Error:", error);
             onGenerate([`Request Error: ${error.message}`]);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -94,7 +122,9 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                 <label>Number of Images:</label>
                 <input type="number" value={numImagesPerPrompt} min="1" max="4" onChange={(e) => setNumImagesPerPrompt(parseInt(e.target.value, 10))} />
             </div>
-            <button type="submit">Generate Image</button>
+            <button type="submit" disabled={loading}>
+                {loading ? 'Generating...' : 'Generate Image'}
+            </button>
         </form>
     );
 };
