@@ -1,23 +1,20 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import ImageGallery from './components/ImageGallery';
+import ImageGeneratorForm from './components/ImageGeneratorForm';
 
 function App() {
+  const [generatedImages, setGeneratedImages] = useState([]);
+
+  const handleImageGeneration = (images) => {
+    setGeneratedImages(images);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Recraft Image Generator</h1>
+      <ImageGeneratorForm onGenerate={handleImageGeneration} />
+      <ImageGallery images={generatedImages} />
     </div>
   );
 }
