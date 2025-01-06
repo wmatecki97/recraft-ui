@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ColorPicker.css';
 
 const ColorPicker = ({ initialColors, onColorsChange }) => {
-    const [colors, setColors] = useState(initialColors || []);
+    const [colors, setColors] = useState([]);
+
+    useEffect(() => {
+        if (initialColors) {
+            setColors(initialColors);
+        }
+    }, [initialColors]);
+
 
     const handleColorChange = (index, newColor) => {
         const updatedColors = [...colors];
