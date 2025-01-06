@@ -1,8 +1,11 @@
 import gradio as gr
 import openai
 import json
+import base64
+from io import BytesIO
+from PIL import Image
 
-def generate_image(api_key, prompt, colors, style, response_format, artistic_level, size, num_images_per_prompt):
+def generate_image(api_key, prompt, colors, response_format, artistic_level, size, num_images_per_prompt):
     try:
         client = openai.OpenAI(base_url='https://external.api.recraft.ai/v1',
                                api_key=api_key)
@@ -12,7 +15,6 @@ def generate_image(api_key, prompt, colors, style, response_format, artistic_lev
         params = {
             "prompt": prompt,
             "extra_body": {
-
             "style": "vector_illustration",
             "substyle":"roundish_flat",
             "model": "recraftv3",
@@ -29,7 +31,20 @@ def generate_image(api_key, prompt, colors, style, response_format, artistic_lev
         response = client.images.generate(**params)
 
         if response:
-            image_urls = [item.url for item in response.data]
+            image_urls = []
+            for item in response.
+                if response_format == "url":
+                    image_urls.append(item.url)
+                elif response_format == "b64_json":
+                    try:
+                        image_data = base64.b64decode(item.b64_json)
+                        image = Image.open(BytesIO(image_data))
+                        image_urls.append(image)
+                    except Exception as e:
+                        print(f"Error decoding base64 image: {e}")
+                        image_urls.append("Error decoding base64 image")
+                else:
+                    image_urls.append("No response format selected")
             return image_urls
         else:
             return ["No images generated"]
