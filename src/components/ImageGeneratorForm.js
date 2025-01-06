@@ -2,39 +2,32 @@ import React, { useState, useEffect } from 'react';
 import ColorPicker from './ColorPicker';
 
 const ImageGeneratorForm = ({ onGenerate }) => {
-    const [apiKey, setApiKey] = useState('');
-    const [prompt, setPrompt] = useState('Turtle working in AI');
+    const [apiKey, setApiKey] = useState(null);
+    const [prompt, setPrompt] = useState(null);
     const initialColorsData = [{"rgb":[142,202,230]},{"rgb":[88,180,209]},{"rgb":[33,158,188]},{"rgb":[18,103,130]},{"rgb":[2,48,71]},{"rgb":[255,183,3]},{"rgb":[253,158,2]},{"rgb":[251,133,0]}];
-    const [colors, setColors] = useState(initialColorsData.map(color => rgbToHex(color.rgb)));
-    const [responseFormat, setResponseFormat] = useState('url');
-    const [artisticLevel, setArtisticLevel] = useState(5);
-    const [size, setSize] = useState('1024x1024');
-    const [numImagesPerPrompt, setNumImagesPerPrompt] = useState(1);
+    const [colors, setColors] = useState(null);
+    const [responseFormat, setResponseFormat] = useState(null);
+    const [artisticLevel, setArtisticLevel] = useState(null);
+    const [size, setSize] = useState(null);
+    const [numImagesPerPrompt, setNumImagesPerPrompt] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+    const [showAdvancedSettings, setShowAdvancedSettings] = useState(null);
 
     useEffect(() => {
         const storedSettings = localStorage.getItem('imageGeneratorSettings');
+        let settings;
         if (storedSettings) {
-            const settings = JSON.parse(storedSettings);
-            setApiKey(settings.apiKey || '');
-            setPrompt(settings.prompt || 'Turtle working in AI');
-            setColors(settings.colors || initialColorsData.map(color => rgbToHex(color.rgb)));
-            setResponseFormat(settings.responseFormat || 'url');
-            setArtisticLevel(settings.artisticLevel || 5);
-            setSize(settings.size || '1024x1024');
-            setNumImagesPerPrompt(settings.numImagesPerPrompt || 1);
-            setShowAdvancedSettings(settings.showAdvancedSettings || false);
-        } else {
-            // Only set default values if no settings are found in local storage
-            setPrompt('Turtle working in AI');
-            setColors(initialColorsData.map(color => rgbToHex(color.rgb)));
-            setResponseFormat('url');
-            setArtisticLevel(5);
-            setSize('1024x1024');
-            setNumImagesPerPrompt(1);
-            setShowAdvancedSettings(false);
+            settings = JSON.parse(storedSettings);
         }
+        
+        setApiKey(settings?.apiKey || '');
+        setPrompt(settings?.prompt || 'Turtle working in AI');
+        setColors(settings?.colors || initialColorsData.map(color => rgbToHex(color.rgb)));
+        setResponseFormat(settings?.responseFormat || 'url');
+        setArtisticLevel(settings?.artisticLevel || 5);
+        setSize(settings?.size || '1024x1024');
+        setNumImagesPerPrompt(settings?.numImagesPerPrompt || 1);
+        setShowAdvancedSettings(settings?.showAdvancedSettings || false);
     }, []);
 
     useEffect(() => {
