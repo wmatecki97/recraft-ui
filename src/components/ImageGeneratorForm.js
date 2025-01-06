@@ -5,7 +5,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
     const [apiKey, setApiKey] = useState(null);
     const [prompt, setPrompt] = useState(null);
     const initialColorsData = [{"rgb":[142,202,230]},{"rgb":[88,180,209]},{"rgb":[33,158,188]},{"rgb":[18,103,130]},{"rgb":[2,48,71]},{"rgb":[255,183,3]},{"rgb":[253,158,2]},{"rgb":[251,133,0]}];
-    const [colors, setColors] = useState(null);
+    const [colors, setColors] = useState([]);
     const [responseFormat, setResponseFormat] = useState(null);
     const [artisticLevel, setArtisticLevel] = useState(null);
     const [size, setSize] = useState(null);
