@@ -22,6 +22,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
     const [generatedImages, setGeneratedImages] = useState([]);
     const [style, setStyle] = useState("vector_illustration");
     const [substyle, setSubstyle] = useState("roundish_flat");
+    const [styleId, setStyleId] = useState("");
 
 
     useEffect(() => {
@@ -41,6 +42,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
         setShowAdvancedSettings(settings?.showAdvancedSettings || false);
         setStyle(settings?.style || "vector_illustration");
         setSubstyle(settings?.substyle || "roundish_flat");
+        setStyleId(settings?.styleId || "");
         setIsLoaded(true);
     }, []);
 
@@ -56,11 +58,12 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                 numImagesPerPrompt,
                 showAdvancedSettings,
                 style,
-                substyle
+                substyle,
+                styleId
             };
             localStorage.setItem('imageGeneratorSettings', JSON.stringify(settings));
         }
-    }, [apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, isLoaded, style, substyle]);
+    }, [apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, isLoaded, style, substyle, styleId]);
 
 
     const handleColorsChange = (newColors) => {
@@ -72,6 +75,28 @@ const ImageGeneratorForm = ({ onGenerate }) => {
         event.preventDefault();
         setLoading(true);
         try {
+            const requestBody = {
+                prompt: prompt,
+                model: "recraftv3",
+                n: numImagesPerPrompt,
+                controls: {
+                    colors: colors.map(hex => {
+                        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                        return result ? {
+                            "rgb": [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
+                        } : null;
+                    }).filter(color => color)
+                }
+            };
+
+            if (styleId) {
+                requestBody.style_id = styleId;
+            } else {
+                requestBody.style = style;
+                requestBody.substyle = substyle;
+            }
+
+
             const response = await fetch('https://external.api.recraft.ai/v1/images/generations', {
                 method: 'POST',
                 headers: {
@@ -79,24 +104,7 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${apiKey}`,
                 },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    model: "recraftv3",
-                    n: numImagesPerPrompt,
-                    style: style,
-                    substyle: substyle,
-                    // "response_format": responseFormat,
-                    // "artistic_level": artisticLevel,
-                    // "size": size,
-                    "controls": {
-                        "colors": colors.map(hex => {
-                            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                            return result ? {
-                                "rgb": [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
-                            } : null;
-                        }).filter(color => color)
-                    }
-                }),
+                body: JSON.stringify(requestBody),
             });
 
             if (!response.ok) {
@@ -155,10 +163,12 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     setStyle={setStyle}
                     substyle={substyle}
                     setSubstyle={setSubstyle}
+                    styleId={styleId}
+                    setStyleId={setStyleId}
                 />
                 <SettingsImportExport
-                    handleExportSettings={() => handleExportSettings(apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, style, substyle)}
-                    handleImportSettings={(event) => handleImportSettings(event, setApiKey, setPrompt, setColors, initialColorsData, setResponseFormat, setArtisticLevel, setSize, setNumImagesPerPrompt, setShowAdvancedSettings, setStyle, setSubstyle)}
+                    handleExportSettings={() => handleExportSettings(apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, style, substyle, styleId)}
+                    handleImportSettings={(event) => handleImportSettings(event, setApiKey, setPrompt, setColors, initialColorsData, setResponseFormat, setArtisticLevel, setSize, setNumImagesPerPrompt, setShowAdvancedSettings, setStyle, setSubstyle, setStyleId)}
                 />
                 <GenerateButton loading={loading} handleSubmit={handleSubmit} />
             </form>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AdvancedSettings = ({ artisticLevel, setArtisticLevel, size, setSize, numImagesPerPrompt, setNumImagesPerPrompt, showAdvancedSettings, setShowAdvancedSettings, style, setStyle, substyle, setSubstyle }) => {
+const AdvancedSettings = ({ artisticLevel, setArtisticLevel, size, setSize, numImagesPerPrompt, setNumImagesPerPrompt, showAdvancedSettings, setShowAdvancedSettings, style, setStyle, substyle, setSubstyle, styleId, setStyleId }) => {
 
     const styles = [
         "any",
@@ -129,23 +129,31 @@ const AdvancedSettings = ({ artisticLevel, setArtisticLevel, size, setSize, numI
                         <label>Number of Images:</label>
                         <input type="number" value={numImagesPerPrompt} min="1" max="4" onChange={(e) => setNumImagesPerPrompt(parseInt(e.target.value, 10))} />
                     </div>
-                    <div>
-                        <label>Style:</label>
-                        <select value={style} onChange={(e) => setStyle(e.target.value)}>
-                            {styles.map(style => (
-                                <option key={style} value={style}>{style}</option>
-                            ))}
-                        </select>
+                     <div>
+                        <label>Style ID:</label>
+                        <input type="text" value={styleId} onChange={(e) => setStyleId(e.target.value)} />
                     </div>
-                    {style && style !== "any" && (
-                        <div>
-                            <label>Substyle:</label>
-                            <select value={substyle} onChange={(e) => setSubstyle(e.target.value)}>
-                                {substyles[style].map(substyle => (
-                                    <option key={substyle} value={substyle}>{substyle}</option>
-                                ))}
-                            </select>
-                        </div>
+                    {!styleId && (
+                        <>
+                            <div>
+                                <label>Style:</label>
+                                <select value={style} onChange={(e) => setStyle(e.target.value)}>
+                                    {styles.map(style => (
+                                        <option key={style} value={style}>{style}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {style && style !== "any" && (
+                                <div>
+                                    <label>Substyle:</label>
+                                    <select value={substyle} onChange={(e) => setSubstyle(e.target.value)}>
+                                        {substyles[style].map(substyle => (
+                                            <option key={substyle} value={substyle}>{substyle}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </>
                     )}
                 </>
             )}
