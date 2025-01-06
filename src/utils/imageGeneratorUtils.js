@@ -24,7 +24,7 @@ export const downloadImage = async (url, filename) => {
 };
 
 
-export const handleImportSettings = (event, setApiKey, setPrompt, setColors, initialColorsData, setResponseFormat, setArtisticLevel, setSize, setNumImagesPerPrompt, setShowAdvancedSettings) => {
+export const handleImportSettings = (event, setApiKey, setPrompt, setColors, initialColorsData, setResponseFormat, setArtisticLevel, setSize, setNumImagesPerPrompt, setShowAdvancedSettings, setStyle, setSubstyle) => {
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
@@ -39,6 +39,8 @@ export const handleImportSettings = (event, setApiKey, setPrompt, setColors, ini
                 setSize(settings.size || '1024x1024');
                 setNumImagesPerPrompt(settings.numImagesPerPrompt || 1);
                 setShowAdvancedSettings(settings.showAdvancedSettings || false);
+                setStyle(settings.style || "vector_illustration");
+                setSubstyle(settings.substyle || "roundish_flat");
             } catch (error) {
                 console.error("Error parsing settings file:", error);
                 alert("Failed to import settings. Please ensure the file is a valid JSON.");
@@ -49,7 +51,7 @@ export const handleImportSettings = (event, setApiKey, setPrompt, setColors, ini
 };
 
 
-export const handleExportSettings = (apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings) => {
+export const handleExportSettings = (apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, style, substyle) => {
     const settings = {
         apiKey,
         prompt,
@@ -58,7 +60,9 @@ export const handleExportSettings = (apiKey, prompt, colors, responseFormat, art
         artisticLevel,
         size,
         numImagesPerPrompt,
-        showAdvancedSettings
+        showAdvancedSettings,
+        style,
+        substyle
     };
     const json = JSON.stringify(settings, null, 2);
     const blob = new Blob([json], { type: 'application/json' });

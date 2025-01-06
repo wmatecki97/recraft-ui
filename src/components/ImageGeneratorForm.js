@@ -20,6 +20,8 @@ const ImageGeneratorForm = ({ onGenerate }) => {
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [generatedImages, setGeneratedImages] = useState([]);
+    const [style, setStyle] = useState("vector_illustration");
+    const [substyle, setSubstyle] = useState("roundish_flat");
 
 
     useEffect(() => {
@@ -37,6 +39,8 @@ const ImageGeneratorForm = ({ onGenerate }) => {
         setSize(settings?.size || '1024x1024');
         setNumImagesPerPrompt(settings?.numImagesPerPrompt || 1);
         setShowAdvancedSettings(settings?.showAdvancedSettings || false);
+        setStyle(settings?.style || "vector_illustration");
+        setSubstyle(settings?.substyle || "roundish_flat");
         setIsLoaded(true);
     }, []);
 
@@ -50,11 +54,13 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                 artisticLevel,
                 size,
                 numImagesPerPrompt,
-                showAdvancedSettings
+                showAdvancedSettings,
+                style,
+                substyle
             };
             localStorage.setItem('imageGeneratorSettings', JSON.stringify(settings));
         }
-    }, [apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, isLoaded]);
+    }, [apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, isLoaded, style, substyle]);
 
 
     const handleColorsChange = (newColors) => {
@@ -77,8 +83,8 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     prompt: prompt,
                     model: "recraftv3",
                     n: numImagesPerPrompt,
-                    style: "vector_illustration",
-                    substyle: "roundish_flat",
+                    style: style,
+                    substyle: substyle,
                     // "response_format": responseFormat,
                     // "artistic_level": artisticLevel,
                     // "size": size,
@@ -145,10 +151,14 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                     setNumImagesPerPrompt={setNumImagesPerPrompt}
                     showAdvancedSettings={showAdvancedSettings}
                     setShowAdvancedSettings={setShowAdvancedSettings}
+                    style={style}
+                    setStyle={setStyle}
+                    substyle={substyle}
+                    setSubstyle={setSubstyle}
                 />
                 <SettingsImportExport
-                    handleExportSettings={() => handleExportSettings(apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings)}
-                    handleImportSettings={(event) => handleImportSettings(event, setApiKey, setPrompt, setColors, initialColorsData, setResponseFormat, setArtisticLevel, setSize, setNumImagesPerPrompt, setShowAdvancedSettings)}
+                    handleExportSettings={() => handleExportSettings(apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings, style, substyle)}
+                    handleImportSettings={(event) => handleImportSettings(event, setApiKey, setPrompt, setColors, initialColorsData, setResponseFormat, setArtisticLevel, setSize, setNumImagesPerPrompt, setShowAdvancedSettings, setStyle, setSubstyle)}
                 />
                 <GenerateButton loading={loading} handleSubmit={handleSubmit} />
             </form>
