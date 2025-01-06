@@ -47,7 +47,7 @@ def generate_image(api_key, prompt, colors, response_format, artistic_level, siz
                         with open(file_path, 'wb') as f:
                             for chunk in image_response.iter_content(chunk_size=8192):
                                 f.write(chunk)
-                        image_files.append(file_path)
+                        image_files.append(gr.File(file_path))
                     except requests.exceptions.RequestException as e:
                         print(f"Error downloading image: {e}")
                 else:
@@ -55,15 +55,15 @@ def generate_image(api_key, prompt, colors, response_format, artistic_level, siz
             if image_files:
                 return image_files
             else:
-                return ["No images generated"]
+                return [gr.File(None, label="No images generated")]
         else:
-            return ["No images generated"]
+            return [gr.File(None, label="No images generated")]
     except requests.exceptions.RequestException as e:
         print(f"Request Error: {e}")
-        return [f"Request Error: {e}"]
+        return [gr.File(None, label=f"Request Error: {e}")]
     except Exception as e:
         print(f"Error: {e}")
-        return [f"Error: {e}"]
+        return [gr.File(None, label=f"Error: {e}")]
 
 if __name__ == "__main__":
     with gr.Blocks() as demo:
@@ -79,12 +79,12 @@ if __name__ == "__main__":
         
         
         generate_button = gr.Button("Generate Image")
-        gallery = gr.Gallery(label="Generated Images")
+        file_output = gr.File(label="Generated Images")
 
         generate_button.click(
             generate_image,
             inputs=[api_key, prompt, colors, response_format, artistic_level, size, num_images_per_prompt],
-            outputs=gallery
+            outputs=file_output
         )
 
     demo.launch()
