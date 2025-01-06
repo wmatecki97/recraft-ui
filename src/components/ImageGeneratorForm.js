@@ -19,6 +19,8 @@ const ImageGeneratorForm = ({ onGenerate }) => {
     const [loading, setLoading] = useState(false);
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [generatedImages, setGeneratedImages] = useState([]);
+
 
     useEffect(() => {
         const storedSettings = localStorage.getItem('imageGeneratorSettings');
@@ -105,15 +107,19 @@ const ImageGeneratorForm = ({ onGenerate }) => {
                 if (image_urls.length > 0) {
                     await Promise.all(image_urls.map(image => downloadImage(image.url, image.filename)));
                     onGenerate(image_urls.map(image => image.url));
+                    setGeneratedImages(image_urls.map(image => image.url));
                 } else {
                     onGenerate(["No image URLs found in response"]);
+                    setGeneratedImages(["No image URLs found in response"]);
                 }
             } else {
                 onGenerate(["No images generated"]);
+                setGeneratedImages(["No images generated"]);
             }
         } catch (error) {
             console.error("Request Error:", error);
             onGenerate([`Request Error: ${error.message}`]);
+            setGeneratedImages([`Request Error: ${error.message}`]);
         } finally {
             setLoading(false);
         }
@@ -121,30 +127,43 @@ const ImageGeneratorForm = ({ onGenerate }) => {
 
 
     return (
-        <form onSubmit={handleSubmit}>
-            <ApiKeyInput apiKey={apiKey} setApiKey={setApiKey} />
-            <PromptInput prompt={prompt} setPrompt={setPrompt} />
-            <div>
-                <label>Colors:</label>
-                <ColorPicker initialColors={colors} onColorsChange={handleColorsChange} />
-            </div>
+        <div>
+            <form onSubmit={handleSubmit}>
+                <ApiKeyInput apiKey={apiKey} setApiKey={setApiKey} />
+                <PromptInput prompt={prompt} setPrompt={setPrompt} />
+                <div>
+                    <label>Colors:</label>
+                    <ColorPicker initialColors={colors} onColorsChange={handleColorsChange} />
+                </div>
 
-            <AdvancedSettings
-                artisticLevel={artisticLevel}
-                setArtisticLevel={setArtisticLevel}
-                size={size}
-                setSize={setSize}
-                numImagesPerPrompt={numImagesPerPrompt}
-                setNumImagesPerPrompt={setNumImagesPerPrompt}
-                showAdvancedSettings={showAdvancedSettings}
-                setShowAdvancedSettings={setShowAdvancedSettings}
-            />
-            <SettingsImportExport
-                handleExportSettings={() => handleExportSettings(apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings)}
-                handleImportSettings={(event) => handleImportSettings(event, setApiKey, setPrompt, setColors, initialColorsData, setResponseFormat, setArtisticLevel, setSize, setNumImagesPerPrompt, setShowAdvancedSettings)}
-            />
-            <GenerateButton loading={loading} handleSubmit={handleSubmit} />
-        </form>
+                <AdvancedSettings
+                    artisticLevel={artisticLevel}
+                    setArtisticLevel={setArtisticLevel}
+                    size={size}
+                    setSize={setSize}
+                    numImagesPerPrompt={numImagesPerPrompt}
+                    setNumImagesPerPrompt={setNumImagesPerPrompt}
+                    showAdvancedSettings={showAdvancedSettings}
+                    setShowAdvancedSettings={setShowAdvancedSettings}
+                />
+                <SettingsImportExport
+                    handleExportSettings={() => handleExportSettings(apiKey, prompt, colors, responseFormat, artisticLevel, size, numImagesPerPrompt, showAdvancedSettings)}
+                    handleImportSettings={(event) => handleImportSettings(event, setApiKey, setPrompt, setColors, initialColorsData, setResponseFormat, setArtisticLevel, setSize, setNumImagesPerPrompt, setShowAdvancedSettings)}
+                />
+                <GenerateButton loading={loading} handleSubmit={handleSubmit} />
+            </form>
+            <div className="generated-images">
+                {generatedImages.map((imageUrl, index) => (
+                    <div key={index}>
+                        {imageUrl.startsWith("Request Error") || imageUrl === "No images generated" || imageUrl === "No image URLs found in response" ? (
+                            <p>{imageUrl}</p>
+                        ) : (
+                            <img src={imageUrl} alt={`Generated Image ${index + 1}`} style={{ maxWidth: '300px', margin: '10px' }} />
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
 
