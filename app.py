@@ -33,8 +33,11 @@ def generate_image(api_key, prompt, colors, style, response_format, artistic_lev
         response_data = response.json()
 
         if response_data and response_data.get('data'):
-            image_urls = [item.get('url') for item in response_data['data']]
-            return image_urls
+            image_urls = [item.get('url') for item in response_data['data'] if item.get('url')]
+            if image_urls:
+                return image_urls
+            else:
+                return ["No image URLs found in response"]
         else:
             return ["No images generated"]
     except requests.exceptions.RequestException as e:
